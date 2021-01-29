@@ -1,0 +1,14 @@
+stages:
+ - test
+
+test:python3.8:
+ stage: test
+ before_script:
+  - pip install tox
+  - gcloud version || true
+  - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi
+  - source ./google-cloud-sdk/path.bash.inc
+  - gcloud version
+  - CLOUDSDK_CORE_DISABLE_PROMPTS=1 gcloud components install cloud-datastore-emulator beta
+script:
+  - tox
