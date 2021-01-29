@@ -18,7 +18,7 @@ prepare:python3.8:
       RUN pip install tox\n
       RUN gcloud version || true\n
       RUN if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi\n
-      RUN source /root/google-cloud-sdk/path.bash.inc\n
+      ENTRYPOINT ["/bin/bash", "-c", "source /root/google-cloud-sdk/path.bash.inc && \"$@\"", "-s"]\n
       RUN gcloud version\n
       RUN CLOUDSDK_CORE_DISABLE_PROMPTS=1 gcloud components install cloud-datastore-emulator beta\n
   before_script:  # Put the variable into a Dockerfile
