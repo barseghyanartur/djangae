@@ -1,5 +1,6 @@
 stages:
  - prepare
+ - lint
  - test
 
 prepare:python3.8:
@@ -28,6 +29,11 @@ prepare:python3.8:
      - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
      - docker push $CI_REGISTRY_IMAGE:python3.8
 
+lint:python3:
+  image: $CI_REGISTRY_IMAGE:python3.8
+  stage: lint
+  script:
+    - tox -e flake8
 
 test:python3.8:
  image: $CI_REGISTRY_IMAGE:python3.8
