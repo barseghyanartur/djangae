@@ -1,6 +1,6 @@
 # Djangae
 
-[![Join the chat at https://gitter.im/potatolondon/djangae](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/potatolondon/djangae?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![build-status-image]][travis]
+[![Join the chat at https://gitter.im/potatolondon/djangae](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/potatolondon/djangae?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) ![https://gitlab.com/potato-oss/djangae/djangae/badges/master/pipeline.svg]
 
 The best way to run Django on Google Cloud.
 
@@ -16,7 +16,7 @@ want to) using Django's models with Google Cloud Datastore as the underlying dat
 
 ## Looking for Commercial Support?
 
-Potato offers Commercial Support for all its Open Source projects and we can tailor a support package to your needs. 
+Potato offers Commercial Support for all its Open Source projects and we can tailor a support package to your needs.
 
 If you're interested in commercial support, training, or consultancy then go ahead and contact us at [opensource@potatolondon.com](mailto:opensource@potatolondon.com)
 
@@ -94,7 +94,7 @@ pip install tox
 gcloud components install cloud-datastore-emulator
 ```
 
-If you don't have `gcloud` (the Google Cloud SDK) installed, installation instructions can be found [here](https://cloud.google.com/sdk/install) 
+If you don't have `gcloud` (the Google Cloud SDK) installed, installation instructions can be found [here](https://cloud.google.com/sdk/install)
 
 For running the tests, you just need to run:
 
