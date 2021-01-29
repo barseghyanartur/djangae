@@ -2,6 +2,7 @@ stages:
  - test
 
 test:python3.8:
+ image: python:3.8
  stage: test
  before_script:
   - pip install tox
@@ -10,5 +11,5 @@ test:python3.8:
   - source ./google-cloud-sdk/path.bash.inc
   - gcloud version
   - CLOUDSDK_CORE_DISABLE_PROMPTS=1 gcloud components install cloud-datastore-emulator beta
-script:
-  - tox
+ script:
+   - tox
