@@ -41,11 +41,11 @@ class IAPBackend(BaseBackend):
             signed_user_id, signed_user_email, _ = _validate_iap_jwt(iap_jwt, audience)
 
             assert (signed_user_id == user_id), (
-                    "IAP signed user id does not math HTTP_X_GOOG_AUTHENTICATED_USER_ID. ",
+                    "IAP signed user id does not match HTTP_X_GOOG_AUTHENTICATED_USER_ID. ",
                     "An attacker might have tried to bypass IAP."
                 )
             assert (signed_user_email == email), (
-                    "IAP signed user id does not math HTTP_X_GOOG_AUTHENTICATED_USER_ID. ",
+                    "IAP signed user id does not match HTTP_X_GOOG_AUTHENTICATED_USER_ID. ",
                     "An attacker might have tried to bypass IAP."
                 )
 

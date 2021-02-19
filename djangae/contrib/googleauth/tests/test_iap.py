@@ -4,6 +4,8 @@ from djangae.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import path
 
+from unittest.mock import patch
+
 User = get_user_model()
 
 urlpatterns = [
@@ -11,12 +13,18 @@ urlpatterns = [
 ]
 
 
-@override_settings(ROOT_URLCONF=__name__)
+@override_settings(ROOT_URLCONF=__name__, GOOGLEAUTH_IAP_JWT_AUDIENCE="something")
 class IAPAuthenticationTests(TestCase):
-    def test_user_created_if_authenticated(self):
+    @patch('djangae.contrib.googleauth.backends.iap.id_token.verify_token')
+    def test_user_created_if_authenticated(self, verify_token_mock):
+        user = 99999
+        user_email = 'test@example.com'
+        verify_token_mock.return_value = (user, user_email, '')
+
         headers = {
-            'HTTP_X_GOOG_AUTHENTICATED_USER_ID': 'auth.example.com:99999',
-            'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': 'auth.example.com:test@example.com'
+            'HTTP_X_GOOG_AUTHENTICATED_USER_ID': f'auth.example.com:{user}',
+            'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': f'auth.example.com:̦{user_email}',
+            'X-GOOG-IAP-JWT-ASSERTION': 'JWT',
         }
 
         self.client.get("/", **headers)
@@ -33,7 +41,8 @@ class IAPAuthenticationTests(TestCase):
     def test_email_change(self):
         headers = {
             'HTTP_X_GOOG_AUTHENTICATED_USER_ID': 'auth.example.com:99999',
-            'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': 'auth.example.com:test@example.com'
+            'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': 'auth.example.com:test@example.com',
+            'X-GOOG-IAP-JWT-ASSERTION': 'JWT',
         }
 
         self.client.get("/", **headers)
@@ -48,7 +57,8 @@ class IAPAuthenticationTests(TestCase):
 
         headers = {
             'HTTP_X_GOOG_AUTHENTICATED_USER_ID': 'auth.example.com:99999',
-            'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': 'auth.example.com:test22@example.com'
+            'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': 'auth.example.com:test22@example.com',
+            'X-GOOG-IAP-JWT-ASSERTION': 'JWT',
         }
 
         self.client.get("/", **headers)
@@ -79,7 +89,8 @@ class IAPAuthenticationTests(TestCase):
 
         headers = {
             'HTTP_X_GOOG_AUTHENTICATED_USER_ID': 'auth.example.com:99999',
-            'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': 'auth.example.com:tESt22@example.com'
+            'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': 'auth.example.com:tESt22@example.com',
+            'X-GOOG-IAP-JWT-ASSERTION': 'JWT',
         }
 
         self.client.get("/", **headers)
