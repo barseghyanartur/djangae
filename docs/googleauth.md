@@ -64,13 +64,13 @@ urlpatterns = [
 ]
 ```
 
-## Custom User model
+### Custom User model
 
 Like Django's auth app, googleauth ships a concrete `User` model which you an use directly. However, if you want to customise this, you should
 instead inherit from `AbstractGoogleUser`. This includes all the fields necessary for the googleauth authentication backends, but is an abstract
 model and so avoids multi-table inheritance.
 
-## Custom Permissions
+### Custom Permissions
 
 By default the generated permissions are the standard add, change, delete, and view permissions that Django's auth system
 defines. However you can add additional permissions to this on a per-app-model basis or globally by using the `GOOGLEAUTH_CUSTOM_PERMISSIONS`
@@ -83,7 +83,7 @@ GOOGLEAUTH_CUSTOM_PERMISSIONS = {
 }
 ```
 
-## OAuth 2.0 Configuration
+### OAuth 2.0 Configuration
 
 IAP requires little configuration, but OAuth 2.0 unfortunately requires a bit more. To start with you have the `GOOGLEAUTH_OAUTH_SCOPES` setting. This
 is the list of default scopes that your application asks for when the user is required to login. The default setting is:
@@ -110,12 +110,12 @@ You must generate these values in the Google Cloud Console.
 When you configure OAuth Consent Screen and Credentials on Google Cloud Platform you are
 required to configure a list of Authorised domains and OAuth redirects.
 
-## Linking OAuth & Django Session Expiry
+### Linking OAuth & Django Session Expiry
 
 By default, an oauth session expiring doesn't force log-out the user from their Django session. If however you want to *require* that a Django session
 expires when the oauth session expires, you can do so by setting the `GOOGLEAUTH_LINK_OAUTH_SESSION_EXPIRY` setting to `True`. This will redirect the user back through the oauth flow (although normally transparently).
 
-## Handling App Engine Versioning
+### Handling App Engine Versioning
 
 While working on multiple AppEngine versions it's quite inconvenient to have to update those lists for every new version you deploy.
 In order to workaround the problem we've added the `GOOGLEAUTH_OAUTH_REDIRECT_HOST` setting.
@@ -134,7 +134,23 @@ authentication if necessary:
 LOGIN_URL = reverse_lazy('oauth_login')
 ```
 
-# Testing Authentication Locally
+### IAP configuration
+IAP uses JSON Web Tokens (JWT) to make sure that a request to your app is authorized. This protects your app from the following kind of risks:
+
+- IAP is accidentally disabled;
+- Misconfigured firewalls;
+- Access from within the project.
+- Attackers bypasses IAP unsigned identity headers.
+
+One of the constraints of the validation is the audience should match the `Signed Header JWT Audience` of your project.
+
+To get audience string values from the Cloud Console, go to the [Identity-Aware Proxy settings](https://console.cloud.google.com/security/iap/?_ga=2.175450922.908770789.1613644087-688439372.1485967413) for your project, click **More** next to the Load Balancer resource, and then select **Signed Header JWT Audience**. The Signed Header JWT dialog that appears displays the aud claim for the selected resource.
+
+In order to use IAP backend you need to set `GOOGLEAUTH_IAP_JWT_AUDIENCE` in your settings using the this string.
+
+Please refer to this [page](https://cloud.google.com/iap/docs/signed-headers-howto#verifying_the_jwt_header) for more context.
+
+## Testing Authentication Locally
 
 googleauth ships with a middleware class that simulates IAP authentication.
 
