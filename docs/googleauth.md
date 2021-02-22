@@ -146,7 +146,7 @@ One of the constraints of the validation is the audience should match the `Signe
 
 To get audience string values from the Cloud Console, go to the [Identity-Aware Proxy settings](https://console.cloud.google.com/security/iap/?_ga=2.175450922.908770789.1613644087-688439372.1485967413) for your project, click **More** next to the Load Balancer resource, and then select **Signed Header JWT Audience**. The Signed Header JWT dialog that appears displays the aud claim for the selected resource.
 
-In order to use IAP backend you need to set `GOOGLEAUTH_IAP_JWT_AUDIENCE` in your settings using the this string.
+In order to use IAP backend you need to set `GOOGLEAUTH_IAP_JWT_AUDIENCE` in your settings using this string.
 
 Please refer to this [page](https://cloud.google.com/iap/docs/signed-headers-howto#verifying_the_jwt_header) for more context.
 
