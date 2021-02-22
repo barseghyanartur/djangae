@@ -2,7 +2,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 
 from djangae.contrib.googleauth import _IAP_AUDIENCE
 from djangae.contrib.googleauth.models import UserManager
@@ -25,29 +25,10 @@ class IAPBackend(BaseBackend):
 
 
     def authenticate(self, request, **kwargs):
+        error_partial = 'An attacker might have tried to bypass IAP.'
         atomic = _find_atomic_decorator(User)
         user_id = request.META.get("HTTP_X_GOOG_AUTHENTICATED_USER_ID")
         email = request.META.get("HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL")
-
-        if not getattr(request, "_through_local_iap_middleware", False):
-            try:
-                audience = _get_IAP_audience()
-            except AttributeError:
-                raise ImproperlyConfigured(
-                    "You must specify a %s in settings when using IAPBackend" % (
-                        _IAP_AUDIENCE,
-                    ))
-            iap_jwt = request.META.get("X-GOOG-IAP-JWT-ASSERTION")
-            signed_user_id, signed_user_email, _ = _validate_iap_jwt(iap_jwt, audience)
-
-            assert (signed_user_id == user_id), (
-                    "IAP signed user id does not match HTTP_X_GOOG_AUTHENTICATED_USER_ID. ",
-                    "An attacker might have tried to bypass IAP."
-                )
-            assert (signed_user_email == email), (
-                    "IAP signed user id does not match HTTP_X_GOOG_AUTHENTICATED_USER_ID. ",
-                    "An attacker might have tried to bypass IAP."
-                )
 
         # User not logged in to IAP
         if not user_id or not email:
@@ -60,6 +41,30 @@ class IAPBackend(BaseBackend):
         # Google tokens are namespaced with "auth.google.com:"
         namespace, user_id = user_id.split(":", 1)
         _, email = email.split(":", 1)
+
+        if not getattr(request, "_through_local_iap_middleware", False):
+            try:
+                audience = _get_IAP_audience_from_settings()
+            except AttributeError:
+                raise ImproperlyConfigured(
+                    "You must specify a %s in settings when using IAPBackend" % (
+                        _IAP_AUDIENCE,
+                    ))
+            iap_jwt = request.META.get("X-GOOG-IAP-JWT-ASSERTION")
+
+            try:
+                signed_user_id, signed_user_email = _validate_iap_jwt(iap_jwt, audience)
+            except Exception as e:
+                 raise SuspiciousOperation("**ERROR: JWT validation error {}**\n{}".format(e, error_partial))
+
+            assert (signed_user_id == user_id), (
+                    "IAP signed user id does not match HTTP_X_GOOG_AUTHENTICATED_USER_ID. ",
+                    error_partial,
+                )
+            assert (signed_user_email == email), (
+                    "IAP signed user id does not match HTTP_X_GOOG_AUTHENTICATED_USER_ID. ",
+                    error_partial,
+                )
 
         email = UserManager.normalize_email(email)
         assert email
@@ -129,17 +134,15 @@ def _validate_iap_jwt(iap_jwt, expected_audience):
           for details on how to get this value.
 
     Returns:
-      (user_id, user_email, error_str).
+      (user_id, user_email).
     """
 
-    try:
-        decoded_jwt = id_token.verify_token(
-            iap_jwt, requests.Request(), audience=expected_audience,
-            certs_url='https://www.gstatic.com/iap/verify/public_key')
-        return (decoded_jwt['sub'], decoded_jwt['email'], '')
-    except Exception as e:
-        return (None, None, '**ERROR: JWT validation error {}**'.format(e))
+    decoded_jwt = id_token.verify_token(
+        iap_jwt, requests.Request(), audience=expected_audience,
+        certs_url='https://www.gstatic.com/iap/verify/public_key')
+    return (decoded_jwt['sub'], decoded_jwt['email'])
 
 
-def _get_IAP_audience():
+
+def _get_IAP_audience_from_settings():
     return getattr(settings, _IAP_AUDIENCE)
