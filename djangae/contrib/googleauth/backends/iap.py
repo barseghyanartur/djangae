@@ -23,7 +23,6 @@ class IAPBackend(BaseBackend):
             "HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL" in request.META and \
             "X-GOOG-IAP-JWT-ASSERTION" in request.META
 
-
     def authenticate(self, request, **kwargs):
         error_partial = 'An attacker might have tried to bypass IAP.'
         atomic = _find_atomic_decorator(User)
@@ -55,7 +54,7 @@ class IAPBackend(BaseBackend):
             try:
                 signed_user_id, signed_user_email = _validate_iap_jwt(iap_jwt, audience)
             except Exception as e:
-                 raise SuspiciousOperation("**ERROR: JWT validation error {}**\n{}".format(e, error_partial))
+                raise SuspiciousOperation("**ERROR: JWT validation error {}**\n{}".format(e, error_partial))
 
             assert (signed_user_id == user_id), (
                     "IAP signed user id does not match HTTP_X_GOOG_AUTHENTICATED_USER_ID. ",
@@ -141,7 +140,6 @@ def _validate_iap_jwt(iap_jwt, expected_audience):
         iap_jwt, requests.Request(), audience=expected_audience,
         certs_url='https://www.gstatic.com/iap/verify/public_key')
     return (decoded_jwt['sub'], decoded_jwt['email'])
-
 
 
 def _get_IAP_audience_from_settings():

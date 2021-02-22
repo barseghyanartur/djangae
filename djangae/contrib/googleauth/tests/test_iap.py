@@ -3,7 +3,7 @@ from django.http.response import HttpResponse
 from django.test.utils import override_settings
 from djangae.test import TestCase
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
+from django.core.exceptions import ImproperlyConfigured
 from django.urls import path
 
 from unittest.mock import patch, ANY
@@ -186,7 +186,6 @@ class IAPAuthenticationTests(TestCase):
         response = self.client.get("/", **headers)
         self.assertEqual(response.status_code, 400)
 
-
     @patch('djangae.contrib.googleauth.backends.iap.id_token.verify_token')
     def test_raises_if_user_id_does_not_match(self, verify_token_mock):
         user = '99999'
@@ -199,7 +198,7 @@ class IAPAuthenticationTests(TestCase):
         }
 
         headers = {
-            'HTTP_X_GOOG_AUTHENTICATED_USER_ID': f'auth.example.com:somethingelse',
+            'HTTP_X_GOOG_AUTHENTICATED_USER_ID': 'auth.example.com:somethingelse',
             'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': f'auth.example.com:{user_email}',
             'X-GOOG-IAP-JWT-ASSERTION': JWT,
         }
@@ -219,8 +218,8 @@ class IAPAuthenticationTests(TestCase):
         }
 
         headers = {
-            'HTTP_X_GOOG_AUTHENTICATED_USER_ID': f'auth.example.com:somethingelse',
-            'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': f'auth.example.com:another@email.com',
+            'HTTP_X_GOOG_AUTHENTICATED_USER_ID': f'auth.example.com:{user}',
+            'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': 'auth.example.com:another@email.com',
             'X-GOOG-IAP-JWT-ASSERTION': JWT,
         }
 
@@ -237,11 +236,10 @@ class IAPAuthenticationTests(TestCase):
         )
 
         headers = {
-            'HTTP_X_GOOG_AUTHENTICATED_USER_ID': f'auth.example.com:somethingelse',
-            'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': f'auth.example.com:another@email.com',
+            'HTTP_X_GOOG_AUTHENTICATED_USER_ID': 'auth.example.com:somethingelse',
+            'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': 'auth.example.com:another@email.com',
             'X-GOOG-IAP-JWT-ASSERTION': 'JWT',
         }
-
 
         response = self.client.get("/", **headers)
         verify_token_mock.assert_not_called()
