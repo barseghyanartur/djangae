@@ -4,7 +4,12 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 
-from djangae.contrib.googleauth import _IAP_AUDIENCE
+from djangae.contrib.googleauth import (
+    _GOOG_JWT_ASSERTION_HEADER,
+    _GOOG_AUTHENTICATED_USER_EMAIL_HEADER,
+    _GOOG_AUTHENTICATED_USER_ID_HEADER,
+    _IAP_AUDIENCE
+)
 from djangae.contrib.googleauth.models import UserManager
 
 from google.auth.transport import requests
@@ -19,15 +24,15 @@ class IAPBackend(BaseBackend):
 
     @classmethod
     def can_authenticate(cls, request):
-        return "HTTP_X_GOOG_AUTHENTICATED_USER_ID" in request.META and \
-            "HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL" in request.META and \
-            "X-GOOG-IAP-JWT-ASSERTION" in request.META
+        return _GOOG_AUTHENTICATED_USER_EMAIL_HEADER in request.META and \
+            _GOOG_AUTHENTICATED_USER_EMAIL_HEADER in request.META and \
+            _GOOG_JWT_ASSERTION_HEADER in request.META
 
     def authenticate(self, request, **kwargs):
         error_partial = 'An attacker might have tried to bypass IAP.'
         atomic = _find_atomic_decorator(User)
-        user_id = request.META.get("HTTP_X_GOOG_AUTHENTICATED_USER_ID")
-        email = request.META.get("HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL")
+        user_id = request.META.get(_GOOG_AUTHENTICATED_USER_ID_HEADER)
+        email = request.META.get(_GOOG_AUTHENTICATED_USER_EMAIL_HEADER)
 
         # User not logged in to IAP
         if not user_id or not email:
@@ -49,7 +54,7 @@ class IAPBackend(BaseBackend):
                     "You must specify a %s in settings when using IAPBackend" % (
                         _IAP_AUDIENCE,
                     ))
-            iap_jwt = request.META.get("X-GOOG-IAP-JWT-ASSERTION")
+            iap_jwt = request.META.get(_GOOG_JWT_ASSERTION_HEADER)
 
             try:
                 signed_user_id, signed_user_email = _validate_iap_jwt(iap_jwt, audience)
@@ -57,11 +62,11 @@ class IAPBackend(BaseBackend):
                 raise SuspiciousOperation("**ERROR: JWT validation error {}**\n{}".format(e, error_partial))
 
             assert (signed_user_id == user_id), (
-                    "IAP signed user id does not match HTTP_X_GOOG_AUTHENTICATED_USER_ID. ",
+                    f"IAP signed user id does not match {_GOOG_AUTHENTICATED_USER_ID_HEADER}. ",
                     error_partial,
                 )
             assert (signed_user_email == email), (
-                    "IAP signed user id does not match HTTP_X_GOOG_AUTHENTICATED_USER_ID. ",
+                    f"IAP signed user email does not match {_GOOG_AUTHENTICATED_USER_EMAIL_HEADER}. ",
                     error_partial,
                 )
 
