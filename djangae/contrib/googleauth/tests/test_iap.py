@@ -30,7 +30,7 @@ class IAPAuthenticationTests(TestCase):
         headers = {
             'HTTP_X_GOOG_AUTHENTICATED_USER_ID': f'auth.example.com:{user}',
             'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': f'auth.example.com:{user_email}',
-            'X-GOOG-IAP-JWT-ASSERTION': 'JWT',
+            'HTTP_X_GOOG_IAP_JWT_ASSERTION': 'JWT',
         }
 
         self.client.get("/", **headers)
@@ -56,7 +56,7 @@ class IAPAuthenticationTests(TestCase):
         headers = {
             'HTTP_X_GOOG_AUTHENTICATED_USER_ID': f'auth.example.com:{user}',
             'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': f'auth.example.com:{user_email}',
-            'X-GOOG-IAP-JWT-ASSERTION': 'JWT',
+            'HTTP_X_GOOG_IAP_JWT_ASSERTION': 'JWT',
         }
 
         self.client.get("/", **headers)
@@ -79,7 +79,7 @@ class IAPAuthenticationTests(TestCase):
         headers = {
             'HTTP_X_GOOG_AUTHENTICATED_USER_ID': f'auth.example.com:{user}',
             'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': f'auth.example.com:{user_email}',
-            'X-GOOG-IAP-JWT-ASSERTION': 'JWT',
+            'HTTP_X_GOOG_IAP_JWT_ASSERTION': 'JWT',
         }
 
         self.client.get("/", **headers)
@@ -119,7 +119,7 @@ class IAPAuthenticationTests(TestCase):
         headers = {
             'HTTP_X_GOOG_AUTHENTICATED_USER_ID': f'auth.example.com:{user}',
             'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': f'auth.example.com:{user_email}',
-            'X-GOOG-IAP-JWT-ASSERTION': 'JWT',
+            'HTTP_X_GOOG_IAP_JWT_ASSERTION': 'JWT',
         }
 
         self.client.get("/", **headers)
@@ -138,7 +138,7 @@ class IAPAuthenticationTests(TestCase):
         headers = {
             'HTTP_X_GOOG_AUTHENTICATED_USER_ID': f'auth.example.com:{user}',
             'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': f'auth.example.com:{user_email}',
-            'X-GOOG-IAP-JWT-ASSERTION': 'JWT',
+            'HTTP_X_GOOG_IAP_JWT_ASSERTION': 'JWT',
         }
         with self.assertRaises(ImproperlyConfigured):
             self.client.get("/", **headers)
@@ -157,7 +157,7 @@ class IAPAuthenticationTests(TestCase):
         headers = {
             'HTTP_X_GOOG_AUTHENTICATED_USER_ID': f'auth.example.com:{user}',
             'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': f'auth.example.com:{user_email}',
-            'X-GOOG-IAP-JWT-ASSERTION': JWT,
+            'HTTP_X_GOOG_IAP_JWT_ASSERTION': JWT,
         }
 
         self.client.get("/", **headers)
@@ -180,7 +180,7 @@ class IAPAuthenticationTests(TestCase):
         headers = {
             'HTTP_X_GOOG_AUTHENTICATED_USER_ID': f'auth.example.com:{user}',
             'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': f'auth.example.com:{user_email}',
-            'X-GOOG-IAP-JWT-ASSERTION': JWT,
+            'HTTP_X_GOOG_IAP_JWT_ASSERTION': JWT,
         }
 
         response = self.client.get("/", **headers)
@@ -200,7 +200,7 @@ class IAPAuthenticationTests(TestCase):
         headers = {
             'HTTP_X_GOOG_AUTHENTICATED_USER_ID': 'auth.example.com:somethingelse',
             'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': f'auth.example.com:{user_email}',
-            'X-GOOG-IAP-JWT-ASSERTION': JWT,
+            'HTTP_X_GOOG_IAP_JWT_ASSERTION': JWT,
         }
 
         with self.assertRaises(AssertionError):
@@ -220,7 +220,7 @@ class IAPAuthenticationTests(TestCase):
         headers = {
             'HTTP_X_GOOG_AUTHENTICATED_USER_ID': f'auth.example.com:{user}',
             'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': 'auth.example.com:another@email.com',
-            'X-GOOG-IAP-JWT-ASSERTION': JWT,
+            'HTTP_X_GOOG_IAP_JWT_ASSERTION': JWT,
         }
 
         with self.assertRaises(AssertionError):
@@ -238,7 +238,7 @@ class IAPAuthenticationTests(TestCase):
         headers = {
             'HTTP_X_GOOG_AUTHENTICATED_USER_ID': 'auth.example.com:somethingelse',
             'HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL': 'auth.example.com:another@email.com',
-            'X-GOOG-IAP-JWT-ASSERTION': 'JWT',
+            'HTTP_X_GOOG_IAP_JWT_ASSERTION': 'JWT',
         }
 
         response = self.client.get("/", **headers)
