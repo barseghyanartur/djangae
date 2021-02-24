@@ -58,7 +58,7 @@ class IAPBackend(BaseBackend):
 
             try:
                 signed_user_id, signed_user_email = _validate_iap_jwt(iap_jwt, audience)
-            except Exception as e:
+            except ValueError as e:
                 raise SuspiciousOperation("**ERROR: JWT validation error {}**\n{}".format(e, error_partial))
 
             assert (signed_user_id == user_id), (

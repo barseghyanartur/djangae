@@ -175,7 +175,7 @@ class IAPAuthenticationTests(TestCase):
         user_email = 'tESt22@example.com'
         JWT = 'JWT'
 
-        verify_token_mock.side_effect = Exception()
+        verify_token_mock.side_effect = ValueError()
 
         headers = {
             'HTTP_X_GOOG_AUTHENTICATED_USER_ID': f'auth.example.com:{user}',
